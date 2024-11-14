@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vrlease.mapper.CommentMapper">
+
+
+    <insert id="addcomment">
+        insert into comment(poster_id,device_id,images,goods,score,create_time,update_time,words,video,parent_id,root_id,replies_count)
+        values(#{posterId},#{deviceId},#{images},#{goods},#{score},#{createTime},#{updateTime},#{words},#{video},#{parentId},#{rootId},#{repliesCount})
+    </insert>
+    <update id="addlike">
+        update comment set goods=goods+1 where id=#{id}
+    </update>
+    <update id="plusRepliesCount">
+        update comment set replies_count=replies_count+1 where id=#{id}
+    </update>
+</mapper>

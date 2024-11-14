@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vrlease.mapper.DeviceMapper">
+
+
+    <insert id="insert">
+        insert into device(name,brand_id,images,sold,create_time,update_time)
+        values(#{name},#{brandId},#{images},#{sold},#{createTime},#{updateTime})
+    </insert>
+    <update id="updateById">
+        update device set name=#{device.name},brand_id=#{device.brandId},images=#{device.images},sold=#{device.sold},update_time=#{device.updateTime}
+        where id=#{id}
+    </update>
+    <select id="selectById" resultType="com.vrlease.entity.Device">
+        select * from device where id=#{id}
+    </select>
+    <select id="pageQuery" resultType="com.vrlease.entity.Device">
+        select * from device
+    </select>
+    <select id="queryBybrand" resultType="com.vrlease.entity.Device">
+        select * from device where brand_id=#{brandId}
+    </select>
+</mapper>

@@ -1,0 +1,50 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+# 忽略特定的配置文件
+src/main/resources/application-dev.yml
+src/main/resources/application.yaml
+src/main/resources/application.yml
+
+# 为了更安全，也可以忽略所有包含 application 的配置文件
+src/main/resources/application*.yml
+src/main/resources/application*.yaml
+
+# Application properties
+application-prod.yml
+application-prod.yaml
+application.yml
+application.yaml
+*.p12
+*.pem
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
