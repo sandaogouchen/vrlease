@@ -96,22 +96,28 @@ public class UserServiceImpl implements UserService {
         Map map = new HashMap();
         User user = new User();
         String username = userLoginDTO.getUsername();
-        if(username != null){
+        if(username != null && !username.isBlank()){
             user = userMapper.findUserByName(username);
         }
-        else if(userLoginDTO.getMail() != null){
+        else if(userLoginDTO.getMail() != null && !userLoginDTO.getMail().isBlank()){
+            if(RegexUtils.isEmailInvalid(userLoginDTO.getMail())){
+                map.put("-1","邮箱格式不正确");
+                return null;
+            }
             user = userMapper.findUserBymail(userLoginDTO.getMail());
         }
-        else if(userLoginDTO.getPhone() != null){
+        else if(userLoginDTO.getPhone() != null && !userLoginDTO.getPhone().isBlank()){
             user = userMapper.findUserByPhone(userLoginDTO.getPhone());
         }
         if(user == null){
             RuntimeException e = new RuntimeException("用户名不存在");
+            return null;
         }
         String password = userLoginDTO.getPassword();
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
         if(!user.getPassword().equals(md5Password)){
             RuntimeException e = new RuntimeException("密码错误");
+            return null;
         }
         return user;
     }

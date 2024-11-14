@@ -45,7 +45,12 @@ public class UserController {
                 .token(token)
                 .build();
         Map map = new HashMap();
-        map.put("success",userLoginVO);
+        if(user != null) {
+            map.put("success", userLoginVO);
+        }
+        else{
+            map.put("-1","用户名或密码错误");
+        }
         return JSONUtil.toJsonStr(map);
     }
 
