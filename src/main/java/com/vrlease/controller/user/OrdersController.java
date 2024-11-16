@@ -1,8 +1,6 @@
 package com.vrlease.controller.user;
 
 import cn.hutool.json.JSONUtil;
-import com.sky.result.PageResult;
-import com.sky.result.Result;
 import com.vrlease.dto.OrdersPaymentDTO;
 import com.vrlease.dto.OrdersSubmitDTO;
 import com.vrlease.dto.OrdershistoryDTO;
@@ -26,7 +24,7 @@ public class OrdersController {
 
     @PostMapping("/submit")
     @ApiOperation("下单")
-    public String submit(OrdersSubmitDTO ordersSubmitDTO){
+    public String submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO){
        return ordersService.submit(ordersSubmitDTO);
     }
 
@@ -43,7 +41,7 @@ public class OrdersController {
 
     @GetMapping("/historyOrders")
     @ApiOperation("历史订单查询")
-    public String page(OrdershistoryDTO ordershistoryDTO) {
+    public String page(@RequestBody OrdershistoryDTO ordershistoryDTO) {
         return ordersService.pageQuery4User(ordershistoryDTO);
     }
 

@@ -2,10 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.vrlease.mapper.OrdersMapper">
-    <insert id="insert">
-        insert into orders(number,user_id,device_id,amount,status,pay_method,pay_status,order_time,lease_time,phone,address,user_name,remark,device_account,user_real_name)
-        values(#{number},#{userId},#{deviceId},#{amount},#{status},#{payMethod},#{payStatus},#{orderTime},#{leaseTime},#{phone},#{address},#{userName},#{remark},#{deviceAccount},#{userRealName})
-    </insert>
+
 
 
     <update id="update" parameterType="com.vrlease.entity.Orders">
@@ -92,5 +89,9 @@
             </if>
         </where>
     </select>
+    <select id="getByOrderId" resultType="com.vrlease.entity.Orders">
+        select * from orders where order_id = #{id}
+    </select>
+
 
 </mapper>

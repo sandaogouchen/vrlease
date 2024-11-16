@@ -23,7 +23,7 @@ public class CommentController {
 
     @PostMapping("/addComment")
     @ApiOperation( "添加,回复评论")
-    public String addComment(CommentAddDTO commentAddDTO) {
+    public String addComment(@RequestBody CommentAddDTO commentAddDTO) {
         return commentService.addComment(commentAddDTO);
     }
 
@@ -35,7 +35,7 @@ public class CommentController {
 
     @PostMapping("/like")
     @ApiOperation("点赞")
-    public String like(CommentLikeDTO commentLikeDTO) {
+    public String like(@RequestBody CommentLikeDTO commentLikeDTO) {
         return commentService.like(commentLikeDTO);
     }
 

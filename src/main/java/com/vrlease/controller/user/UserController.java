@@ -1,7 +1,7 @@
 package com.vrlease.controller.user;
 
 import cn.hutool.json.JSONUtil;
-import com.sky.constant.JwtClaimsConstant;
+import com.vrlease.util.JwtClaimsConstant;//TODO
 import com.sky.utils.JwtUtil;
 import com.vrlease.dto.UserDTO;
 import com.vrlease.dto.UserLoginDTO;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(UserLoginDTO userLoginDTO) {
+    public String login(@RequestBody UserLoginDTO userLoginDTO) {
         User user = userService.login(userLoginDTO);
 
         Map<String, Object> claims = new HashMap<>();
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String register(UserRegisterDTO userRegisterDTO){
+    public String register(@RequestBody UserRegisterDTO userRegisterDTO){
 
         return userService.register(userRegisterDTO);
     }

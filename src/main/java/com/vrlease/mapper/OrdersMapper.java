@@ -3,7 +3,9 @@ package com.vrlease.mapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.vrlease.dto.OrdersPageQueryDTO;
 import com.vrlease.entity.Orders;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
@@ -14,9 +16,18 @@ import java.util.Map;
 public interface OrdersMapper {
     /**
      * 插入订单数据
+     *
      * @param orders
+     * @return
      */
-    void insert(Orders orders);
+    @Insert("INSERT INTO orders (device_id, order_id, status, user_id, order_time, " +
+            "pay_method, device_account, pay_status, amount, remark, lease_time, " +
+            "phone, user_real_name, delivery_status) " +
+            "VALUES (#{deviceId}, #{orderId}, #{status}, #{userId}, #{orderTime}, " +
+            "#{payMethod}, #{deviceAccount}, #{payStatus}, #{amount}, #{remark}, #{leaseTime}, " +
+            "#{phone}, #{userRealName}, #{deliveryStatus})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    Long insert(Orders orders);
 
     /**
      * 根据订单号和用户id查询订单
@@ -83,4 +94,6 @@ public interface OrdersMapper {
 
     @Select("select * from orders where user_id = #{id}")
     List<Orders> pageQuery1(Long id);
+
+    Orders getByOrderId(Long id);
 }

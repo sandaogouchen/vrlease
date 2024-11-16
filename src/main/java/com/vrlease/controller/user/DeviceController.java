@@ -7,10 +7,7 @@ import com.vrlease.service.DeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -24,7 +21,7 @@ public class DeviceController {
 
     @PostMapping("/pageQuery")
     @ApiOperation("分页查询设备")
-    public String pageQuery(DevicePageDTO devicePageDTO) {
+    public String pageQuery(@RequestBody DevicePageDTO devicePageDTO) {
         return deviceService.pageQuery(devicePageDTO);
     }
 
@@ -36,7 +33,7 @@ public class DeviceController {
 
     @PostMapping("/queryBybrand")
     @ApiOperation("根据品牌查询设备")
-    public String queryBybrand(QueryBrandDTO queryBrandDTO) {
+    public String queryBybrand(@RequestBody QueryBrandDTO queryBrandDTO) {
         return deviceService.queryBybrand(queryBrandDTO);
     }
 }

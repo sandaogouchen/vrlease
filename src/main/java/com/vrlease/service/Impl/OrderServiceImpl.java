@@ -24,6 +24,8 @@ import javax.annotation.Resource;
 import javax.management.RuntimeErrorException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,19 +64,47 @@ public class OrderServiceImpl implements OrdersService {
      */
     @Transactional
     public String submit(OrdersSubmitDTO ordersSubmitDTO) {
-        Map map = new HashMap();
-        Orders orders = new Orders();
-        BeanUtils.copyProperties(ordersSubmitDTO, orders);
-        Long userId = BaseContext.getCurrentId();
-        orders.setStatus(PENDING_PAYMENT);
-        orders.setPayStatus(UN_PAID);
-        orders.setOrderTime(LocalDateTime.now());
+        // 创建新订单对象
+        Orders orders = Orders.builder()
+                .deviceId(ordersSubmitDTO.getDeviceId())
+                .deviceAccount(ordersSubmitDTO.getDeviceAmount())
+                .leaseTime(ordersSubmitDTO.getLeaseTime())
+                .userRealName(ordersSubmitDTO.getUserRealName())
+                .payMethod(ordersSubmitDTO.getPayMethod())
+                .remark(ordersSubmitDTO.getRemark())
+                .phone(ordersSubmitDTO.getPhone())
+                .deliveryStatus(ordersSubmitDTO.getDeliveryStatus())
+                .amount(ordersSubmitDTO.getAmount())
+                // 设置基础订单信息
+                .userId(BaseContext.getCurrentId())
+                .status(PENDING_PAYMENT)
+                .payStatus(UN_PAID)
+                .orderTime(LocalDateTime.now())
+                .orderId(String.valueOf(System.currentTimeMillis())) // 生成订单号
+                .build();
 
-        orders.setUserId(userId);
+        // 插入订单
+        Long id = nextId("order");
+        orders.setOrderId(String.valueOf(id));
         ordersMapper.insert(orders);
-        map.put("OrderPayment",orders);
-        return JSONUtil.toJsonStr(map);
+        // 由于使用了 @Options(useGeneratedKeys = true)，orders 对象现在包含了生成的 ID
+        // 创建返回结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", id);
+
+        return JSONUtil.toJsonStr(result);
     }
+    private static final long BEGIN_TIMESTAMP = 1731182520L;
+    public long nextId(String keyPrefix){
+        LocalDateTime now = LocalDateTime.now();
+        Long second = now.toEpochSecond(ZoneOffset.UTC);
+
+        Long offset = second - BEGIN_TIMESTAMP;
+        String day = now.format(DateTimeFormatter.ofPattern("yyyy:MM:dd"));
+        Long cnt = stringRedisTemplate.opsForValue().increment("icr:" + keyPrefix + ":" + day);
+        return offset << 32 | cnt;
+    }
+
 
 
 
@@ -109,7 +139,7 @@ public String payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
     JSONObject result = weChatPayUtil.pay(
             ordersPaymentDTO.getOrderNumber(), // 商户订单号
             ordersDB.getAmount(), // 实际支付金额
-            "VR设备租赁订单-" + ordersDB.getNumber(), // 商品描述
+            "VR设备租赁订单-" + ordersDB.getOrderId(), // 商品描述
             user.getOpenid() // 微信用户openid
     );
 
@@ -194,8 +224,8 @@ public String payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
      * @return
      */
     public String details(Long id) {
-        // 根据id查询订单
-        Orders orders = ordersMapper.getById(id);
+        // 根据Number查询订单
+        Orders orders = ordersMapper.getByOrderId(id);
 
         // 查询该订单对应的菜品/套餐明细
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
@@ -233,8 +263,8 @@ public String payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
             //调用微信支付退款接口
             weChatPayUtil.refund(
-                    ordersDB.getNumber(), //商户订单号
-                    ordersDB.getNumber(), //商户退款单号
+                    ordersDB.getOrderId(), //商户订单号
+                    ordersDB.getOrderId(), //商户退款单号
                     new BigDecimal(0.01),//退款金额，单位 元
                     new BigDecimal(0.01));//原订单金额
 
@@ -323,7 +353,7 @@ public String payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
 
         // 将每一条订单菜品信息拼接为字符串（格式：宫保鸡丁*3；）
         List<String> orderDishList = orderDetailList.stream().map(x -> {
-            String orderDish = x.getName() + "*" + x.getNumber() + ";";
+            String orderDish = x.getName() + "*" + x.getOrderId() + ";";
             return orderDish;
         }).collect(Collectors.toList());
 
@@ -419,8 +449,8 @@ public String payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         if (payStatus == 1) {
             //用户已支付，需要退款
             String refund = weChatPayUtil.refund(
-                    ordersDB.getNumber(),
-                    ordersDB.getNumber(),
+                    ordersDB.getOrderId(),
+                    ordersDB.getOrderId(),
                     new BigDecimal(0.01),
                     new BigDecimal(0.01));
             log.info("申请退款：{}", refund);
